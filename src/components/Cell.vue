@@ -1,13 +1,16 @@
 <template lang="pug">
-div(:class="(color === 'w') ? 'tile white-tile' : 'tile black-tile'"
+div(:class="(color === 'w') ? 'tile white-tile img-container' : 'tile black-tile img-container'"
+  
   @dragover.prevent
-  @drop.prevent="drop")
+  @drop.prevent="drop"
+  @drop="onDrop")
+  
   div(v-if="Object.keys(piece).length > 0" :id="piece.id")         
     img(:id="String(piece.id)" 
       :src="require(`@/${image}`)" 
       alt="hola"
       :draggable="draggable"
-      @dragstart="dragStart"
+      @dragstart="dragStart($event,piece.id)"
       @dragover.stop)   
   
 </template>
@@ -16,11 +19,15 @@ div(:class="(color === 'w') ? 'tile white-tile' : 'tile black-tile'"
 
 export default {
   data(){
-    return{
-      
+    return{ 
+      idCellSelected:0
+
     }
   },
   props:{
+    id:{
+      type: Number
+    },
     color:{
       type: String
     },
@@ -30,26 +37,68 @@ export default {
     },
     draggable:{
       type: Boolean
-    }
+    },
+    method:{
+      type: Function
+    },
+    
+    
   },
   methods:{
+    startDrag (evt, pieceId) {
+      console.log("drag", pieceId)
+      evt.dataTransfer.dropEffect = 'move'
+      evt.dataTransfer.effectAllowed = 'move'
+      evt.dataTransfer.setData('itemID', pieceId)
+  	},
+
+  	onDrop (evt) {
+  		const itemID = evt.dataTransfer.getData('itemID')
+      const card = document.getElementById(itemID);
+  		console.log("ItemID", card )
+  	},
+
+
     dragStart(e){
+
+      e.dataTransfer.dropEffect ='move'
+      e.dataTransfer.effectAllowed ='move'
+
+      e.dataTransfer.setData('piece_id', target.id);
+      
       //console.log(this.piece)
-        const target = e.target;
+        //const target = e.target;
         //console.log(target)
-        e.dataTransfer.setData('piece_id', target.id);
+        //this.method( target.id, this.piece )
+        //this.idCellSelected = this.id
+        //console.log(this.idCellSelected)
         //setTimeout(() => {
           //target.style.display="none"
         //},0)
     },
-     drop: e => {
+     drop(e, id, update){
         const piece_id = e.dataTransfer.getData('piece_id');
+        
         //console.log("drop", piece_id)
         const card = document.getElementById(piece_id);
         //card.style.display = "block";
         //console.log("element", card)
         //console.log("target", e.target)
-        e.target.appendChild(card);
+        //e.target.appendChild(card);
+        console.log("drop")
+
+        console.log( this.piece, this.id )
+        
+        
+        console.log("dop", this.idCellSelected)
+        //console.log(e.target)
+        this.method(piece_id, this.id, this.idCellSelected)
+        //console.log(e.target)
+
+        //console.log( this.pieces )
+
+
+         
       },
     
   },
@@ -88,6 +137,10 @@ export default {
 </script>
 
 <style lang="less">
+
+  .img-container{
+    height: inherit;    
+  }
 
   .tile{
     display: grid;
