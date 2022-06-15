@@ -3,13 +3,13 @@ div(:class="(color === 'w') ? 'tile white-tile img-container' : 'tile black-tile
   @dragover.prevent
   @drop.prevent="drop"
   @drop="onDrop")  
-  div(v-if="pieceExists")         
-    img(:id="String(pieceSelected.id)" 
-      :src="require(`@/${image}`)" 
-      alt="hola"
+  div(v-if="currentPiece")         
+    img( 
+      :src="require(`@/${image}`)"
       :draggable="draggable"
-      @dragstart="dragStart($event,pieceSelected.id)"
-      @dragover.stop)   
+      @dragstart="dragStart($event)"
+      @dragover.stop
+      )   
   
 </template>
 
@@ -18,16 +18,7 @@ div(:class="(color === 'w') ? 'tile white-tile img-container' : 'tile black-tile
 import { mapState, mapActions , mapGetters} from 'vuex'
 
 export default {
-  data(){
-    return{     
-      pieceExists: false,
-      pieceSelected:{}
-    }
-  },
   props:{
-    id:{
-      type: Number
-    },
     color:{
       type: String
     },
@@ -36,83 +27,70 @@ export default {
       type: Boolean
     },
 
-    posX:{
-      type: Number
+    xpos:{
+      type: String
     },
 
-    posY:{
-      type: Number
+    ypos:{
+      type: String
     }
     
   },  
 
   computed:{
-    ...mapState(['squares', 'pieces']),
+    ...mapState(['pieces']),
     image(){
-      if( this.pieceSelected.type === 'pawn' && this.pieceSelected.color ==='w' ){
+      if (!this.currentPiece) return null
+
+      if( this.currentPiece.type === 'pawn' && this.currentPiece.color ==='w' ){
         return 'assets/images/pawn_w.png'
-      } else if( this.pieceSelected.type === 'pawn' && this.pieceSelected.color==='b'){
+      } else if( this.currentPiece.type === 'pawn' && this.currentPiece.color==='b'){
         return 'assets/images/pawn_b.png'
-      }  else if( this.pieceSelected.type === 'rook' && this.pieceSelected.color === 'b'){
+      }  else if( this.currentPiece.type === 'rook' && this.currentPiece.color === 'b'){
         return 'assets/images/rook_b.png'
-      }else if( this.pieceSelected.type === 'rook' && this.pieceSelected.color === 'w'){
+      }else if( this.currentPiece.type === 'rook' && this.currentPiece.color === 'w'){
         return 'assets/images/rook_w.png'
-      }else if( this.pieceSelected.type === 'knight' && this.pieceSelected.color === 'w'){
+      }else if( this.currentPiece.type === 'knight' && this.currentPiece.color === 'w'){
         return 'assets/images/knight_w.png'
-      }else if( this.pieceSelected.type === 'knight' && this.pieceSelected.color === 'b'){
+      }else if( this.currentPiece.type === 'knight' && this.currentPiece.color === 'b'){
         return 'assets/images/knight_b.png'
-      } else if( this.pieceSelected.type === 'bishop' && this.pieceSelected.color === 'b'){
+      } else if( this.currentPiece.type === 'bishop' && this.currentPiece.color === 'b'){
         return 'assets/images/bishop_b.png'
-      }else if( this.pieceSelected.type === 'bishop' && this.pieceSelected.color === 'w'){
+      }else if( this.currentPiece.type === 'bishop' && this.currentPiece.color === 'w'){
         return 'assets/images/bishop_w.png'
-      }else if( this.pieceSelected.type === 'king' && this.pieceSelected.color === 'b'){
+      }else if( this.currentPiece.type === 'king' && this.currentPiece.color === 'b'){
         return 'assets/images/king_b.png'
-      }else if( this.pieceSelected.type === 'king' && this.pieceSelected.color === 'w'){
+      }else if( this.currentPiece.type === 'king' && this.currentPiece.color === 'w'){
         return 'assets/images/king_w.png'
-      }else if( this.pieceSelected.type === 'queen' && this.pieceSelected.color === 'b'){
+      }else if( this.currentPiece.type === 'queen' && this.currentPiece.color === 'b'){
         return 'assets/images/queen_b.png'
-      }
-      else if( this.pieceSelected.type === 'queen' && this.pieceSelected.color === 'w'){
+      } else if( this.currentPiece.type === 'queen' && this.currentPiece.color === 'w'){
         return 'assets/images/queen_w.png'
       }
-      
+    },
+
+    currentPiece () {
+      return this.pieces.find(item => item.xpos === this.xpos && this.ypos == item.ypos)
     }
   },
 
-  methods:{
-
-    isThereAPiece(){
-      this.pieces.map( p => {        
-        if( p.posX === this.posX && p.posY === this.posY ){          
-          this.pieceExists = true
-          this.pieceSelected = p
-        }
-      })
-    },    
-
-
+  methods:{   
     dragStart(e){
-
       e.dataTransfer.dropEffect ='move'
       e.dataTransfer.effectAllowed ='move'
-      const target = e.target;
-      e.dataTransfer.setData('piece_id', target.id); 
+      e.dataTransfer.setData('piece_id', this.currentPiece.id)
     },
 
-     drop(e){
-        const piece_id = e.dataTransfer.getData('piece_id');        
-        const card = document.getElementById(piece_id);        
-        e.target.appendChild(card);        
+    drop (e){
+      const pieceId = e.dataTransfer.getData('piece_id')
 
-        this.$store.dispatch("updatePieces",[this.posX, this.posY, Number(piece_id)])
-
-      },    
-  },
-
-  mounted(){
-    this.isThereAPiece()
+      this.$store.dispatch('movePiece', {
+        xpos: this.xpos,
+        ypos: this.ypos,
+        id: pieceId
+      })
+    },
   }
- 
 }
 </script>
 

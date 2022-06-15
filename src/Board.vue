@@ -11,9 +11,6 @@ export default {
   name: 'Board',
   components: {
     ChessBoard
-  },
-  mounted(){
-     this.$store.dispatch('connect2')
   }
 }
 </script>

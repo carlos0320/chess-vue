@@ -1,0 +1,225 @@
+[
+  {
+    "type": "rook",
+    "color": "w",
+    "xpos": "0",
+    "ypos": "7"
+  },
+  
+  {
+    "type": "knight",
+    "color": "w",
+    "xpos": "1",
+    "ypos": "7"
+  },
+
+  {
+    "type": "bishop",
+    "color": "w",
+    "xpos": "2",
+    "ypos": "7"
+  },
+
+  {
+    "type": "queen",
+    "color": "w",
+    "xpos": "3",
+    "ypos": "7"
+  },
+
+  {
+    "type": "king",
+    "color": "w",
+    "xpos": "4",
+    "ypos": "7"
+  },
+
+  {
+    "type": "bishop",
+    "color": "w",
+    "xpos": "5",
+    "ypos": "7"
+  },
+
+  {
+    "type": "knight",
+    "color": "w",
+    "xpos": "6",
+    "ypos": "7"
+  },
+
+  {
+    "type": "rook",
+    "color": "w",
+    "xpos": "7",
+    "ypos": "7"
+  },
+
+  {
+    "type": "pawn",
+    "color": "w",
+    "xpos": "0",
+    "ypos": "6"
+  },
+
+  {
+    "type": "pawn",
+    "color": "w",
+    "xpos": "1",
+    "ypos": "6"
+  },
+
+  {
+    "type": "pawn",
+    "color": "w",
+    "xpos": "2",
+    "ypos": "6"
+  },
+
+  {
+    "type": "pawn",
+    "color": "w",
+    "xpos": "3",
+    "ypos": "6"
+  },
+
+  {
+    "type": "pawn",
+    "color": "w",
+    "xpos": "4",
+    "ypos": "6"
+  },
+
+  {
+    "type": "pawn",
+    "color": "w",
+    "xpos": "5",
+    "ypos": "6"
+  },
+
+  {
+    "type": "pawn",
+    "color": "w",
+    "xpos": "6",
+    "ypos": "6"
+  },
+
+  {
+    "type": "pawn",
+    "color": "w",
+    "xpos": "7",
+    "ypos": "6"
+  },
+
+  {
+    "type": "rook",
+    "color": "b",
+    "xpos": "0",
+    "ypos": "0"
+  },
+  
+  {
+    "type": "knight",
+    "color": "b",
+    "xpos": "1",
+    "ypos": "0"
+  },
+
+  {
+    "type": "bishop",
+    "color": "b",
+    "xpos": "2",
+    "ypos": "0"
+  },
+
+  {
+    "type": "queen",
+    "color": "b",
+    "xpos": "3",
+    "ypos": "0"
+  },
+
+  {
+    "type": "king",
+    "color": "b",
+    "xpos": "4",
+    "ypos": "0"
+  },
+
+  {
+    "type": "bishop",
+    "color": "b",
+    "xpos": "5",
+    "ypos": "0"
+  },
+
+  {
+    "type": "knight",
+    "color": "b",
+    "xpos": "6",
+    "ypos": "0"
+  },
+
+  {
+    "type": "rook",
+    "color": "b",
+    "xpos": "7",
+    "ypos": "0"
+  },
+
+  {
+    "type": "pawn",
+    "color": "b",
+    "xpos": "0",
+    "ypos": "1"
+  },
+
+  {
+    "type": "pawn",
+    "color": "b",
+    "xpos": "1",
+    "ypos": "1"
+  },
+
+  {
+    "type": "pawn",
+    "color": "b",
+    "xpos": "2",
+    "ypos": "1"
+  },
+
+  {
+    "type": "pawn",
+    "color": "b",
+    "xpos": "3",
+    "ypos": "1"
+  },
+
+  {
+    "type": "pawn",
+    "color": "b",
+    "xpos": "4",
+    "ypos": "1"
+  },
+
+  {
+    "type": "pawn",
+    "color": "b",
+    "xpos": "5",
+    "ypos": "1"
+  },
+
+  {
+    "type": "pawn",
+    "color": "b",
+    "xpos": "6",
+    "ypos": "1"
+  },
+
+  {
+    "type": "pawn",
+    "color": "b",
+    "xpos": "7",
+    "ypos": "1"
+  }
+]

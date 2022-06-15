@@ -1,156 +1,95 @@
 import { createStore } from 'vuex';
-import { getFirestore, collection, onSnapshot, query, addDoc, doc, updateDoc, deleteDoc, writeBatch, getDoc, getDocs, setDoc } from 'firebase/firestore'
-
+import { collection, onSnapshot, query, doc, updateDoc, deleteDoc, writeBatch, Timestamp } from 'firebase/firestore'
 
 import db from '@/services/firebase'
 
-import {initialPos}  from '../helpers/placingPieces';
+import initialPositions from '../helpers/initialPositions.json';
+let unsubscribe
 
 //const db = getFirestore(app)
 
 export default createStore({
 
   state:{
-    squares:[],
-    pieces:[],
-    isloaded: false
+    gameId: null,
+    pieces:[]
   },
 
   mutations:{
-
-    drawBoard( state ){
-      console.log('board called')
-      let count = 0;
-      for( let i =0; i<8; i++){
-        for ( let j =0; j<8; j++){
-
-          let color = 'w';
-          let properties = {}
-
-          if ( (i+j) % 2 === 0){
-            color= 'w'
-          } else{
-            color='b'
-          }
-
-          properties = {
-            id: count,
-            posX: i,
-            posY: j,
-            color,            
-          }
-
-          state.squares.push( properties )
-          //this.storePositions( properties );
-          count++
-        }
-      }
-      console.log(state.squares)      
-    },
-
-    initialPosition( state ){
-      console.log('called')
-      let countId = 0;
-      
-      console.log("initial", state.squares.length)
-          
-      if ( state.squares.length > 0 ){
-        console.log('si')
-        state.squares.forEach( s => {
-          let piece = initialPos( s, countId )
-          if ( piece ){
-            countId++           
-            state.pieces.push( piece ) 
-          }     
-        })
-      }
-      console.log( state.pieces )
-      console.log( state.pieces )
-    },
-    
-
-    restartPieces( state ){
+    startGame( state, gameId ){
       state.pieces = []
+      state.gameId = gameId
     },
 
-    getPieces( state, data ){
-      
-      state.pieces = [...state.pieces, data]
-      if ( state.pieces.length === 32 ) state.isloaded = true
-      //state.pieces.push(data)
-      //console.log( state.pieces )
+    upsertPiece( state, { id, xpos, ypos, type, color } ){
+      const piece = state.pieces.find(item => item.id === id)
+      if (!piece) {
+        state.pieces.push({ id, xpos, ypos, type, color })
+      } else {
+        piece.id = id 
+        piece.xpos = xpos 
+        piece.ypos = ypos 
+        piece.type = type 
+        piece.color = color 
+      }
     },
 
-    updatePositions( state, data ){
-        state.pieces = state.pieces.map( p => {
-          if ( p.id === Number(data.id)) return data 
-          return p 
-        })
+    deletePiece(state, { id }) {
+      const piece = state.pieces.find(item => item.id === id)
+      if (!piece) return
+      state.pieces.splice(state.pieces.indexOf(piece), 1)
     }
-
-
-
   },
 
   actions:{
+    async initNewGame( {commit, dispatch} ){
+      // const batch = writeBatch(db)
+      // const gameRef = doc(collection(db, 'games'))
+      // batch.set(gameRef, {
+      //   date: Timestamp.now()
+      // })
 
-    async connect2({ commit, state, dispatch}){
-      const q = query(collection(db, "positions"));
-      onSnapshot(q, (snapshot) => {
+      // const pieces = JSON.parse(JSON.stringify(initialPositions))
+      // for (let data of pieces) {
+      //   const pieceRef = doc(collection(gameRef, 'pieces'))
+      //   batch.set(pieceRef, data)
+      // }
+
+      // await batch.commit()
+
+      // commit('startGame', gameRef.id)
+      commit('startGame', 'KUAFwu4jIn6bKgu2NdhC')
+      dispatch('connect')
+    },
+
+    async connect({ commit, state, dispatch}){
+      if (unsubscribe) {
+        unsubscribe()
+      }
+
+      const q = query(collection(db, "games", state.gameId, 'pieces'));
+      unsubscribe = onSnapshot(q, (snapshot) => {
         snapshot.docChanges().forEach((change) => {
+          const data = change.doc.data()
+          data.id = change.doc.id
           if (change.type === "added") {
-              commit("getPieces", change.doc.data())             
+            commit("upsertPiece", data)             
           }
           if (change.type === "modified") {
-            console.log("modified", change.doc.data())
-            commit("updatePositions", change.doc.data())
-            
+            commit("upsertPiece", data)
           }
           if (change.type === "removed") {
-             
+            commit("deletePiece", data)
           }
         });
       });
-
     }, 
     
-
-    async updatePieces({ commit, state, dispatch}, data){
-      let [ newX, newY, pieceId ] = data
-      
-      let piece = state.pieces.find( p => p.id === pieceId)
-
-      piece.posX = newX,
-      piece.posY = newY     
-      
-      await updateDoc(doc(db, 'positions', String(pieceId)), piece)
-      
-    },
-    
-
-    async fetchPieces({ commit, state, dispatch }){
-
-      const docRef = doc(db, "positions", "0");
-      const docSnap = await getDoc(docRef);
-      const positionsRef = collection(db,'positions')
-      
-      if ( docSnap.exists() ){
-        console.log('the document already exists!')
-        commit('drawBoard')
-        commit('restartPieces')
-        //await dispatch('connect')    
-
-      } else{
-        commit('drawBoard')
-        commit('initialPosition')
-        state.pieces.forEach( async p => {          
-          await setDoc(doc(positionsRef, String(p.id)),{...p})
-        })
-        console.log("created")
-      }
+    async movePiece({ state }, {id, xpos, ypos}){ 
+      await updateDoc(doc(db, 'games', state.gameId, 'pieces', String(id)), {
+        xpos,
+        ypos
+      }, { merge: true })
     }
-
   }
-
-
 })
