@@ -11,6 +11,9 @@ export default {
   name: 'Board',
   components: {
     ChessBoard
+  },
+  mounted(){
+     this.$store.dispatch('connect2')
   }
 }
 </script>
@@ -22,8 +25,8 @@ export default {
   padding: 0;
 }
 #app {
-  display: grid;
-  place-content: center;
+  display: flex;
+  
   height: 100vh;
   background-color:#202020;
 }

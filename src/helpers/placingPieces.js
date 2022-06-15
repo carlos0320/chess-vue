@@ -9,7 +9,9 @@ export const initialPos = ( s, countId ) => {
     return{
       id: countId,
       type:'rook',
-      color:'w'
+      color:'w',
+      posX: s.posX,
+      posY: s.posY
     }
   }
   
@@ -18,7 +20,10 @@ export const initialPos = ( s, countId ) => {
     return {
       id: countId,
       type:'rook',
-      color:'b'
+      color:'b',
+      posX: s.posX,
+      posY: s.posY
+      
     }
   } 
 
@@ -27,7 +32,9 @@ export const initialPos = ( s, countId ) => {
      return {
       id: countId,
       type:'knight',
-      color:'b'
+      color:'b',
+      posX: s.posX,
+      posY: s.posY      
     }
   }
 
@@ -35,7 +42,10 @@ export const initialPos = ( s, countId ) => {
      return {
       id: countId,
       type:'knight',
-      color:'w'
+      color:'w',
+      posX: s.posX,
+      posY: s.posY
+      
     }
   }
 
@@ -44,7 +54,10 @@ export const initialPos = ( s, countId ) => {
      return {
       id: countId,
       type:'bishop',
-      color:'b'
+      color:'b',
+      posX: s.posX,
+      posY: s.posY
+      
     }
   }
 
@@ -52,7 +65,10 @@ export const initialPos = ( s, countId ) => {
      return {
       id: countId,
       type:'bishop',
-      color:'w'
+      color:'w',
+      posX: s.posX,
+      posY: s.posY
+      
     }
   }
 
@@ -61,7 +77,10 @@ export const initialPos = ( s, countId ) => {
      return {
       id: countId,
       type:'king',
-      color:'b'
+      color:'b',
+      posX: s.posX,
+      posY: s.posY
+     
     }
   }
 
@@ -69,7 +88,10 @@ export const initialPos = ( s, countId ) => {
      return {
       id: countId,
       type:'king',
-      color:'w'
+      color:'w',
+      posX: s.posX,
+      posY: s.posY
+     
     }
   }
 
@@ -78,7 +100,10 @@ export const initialPos = ( s, countId ) => {
      return {
       id: countId,
       type:'queen',
-      color:'b'
+      color:'b',
+      posX: s.posX,
+      posY: s.posY
+      
     }
   }
 
@@ -86,7 +111,10 @@ export const initialPos = ( s, countId ) => {
      return {
       id: countId,
       type:'queen',
-      color:'w'
+      color:'w',
+      posX: s.posX,
+      posY: s.posY
+   
     }
   }
 
@@ -94,17 +122,23 @@ export const initialPos = ( s, countId ) => {
     return{
       id: countId,
       type: 'pawn',
-      color:'b'            
+      color:'b',
+      posX: s.posX,
+      posY: s.posY
+                
     }
-    countId++;
+   
   }
   if ( s.posX === 6){
     return {
       id: countId,
       type: 'pawn',
-      color:'w'            
+      color:'w',
+      posX: s.posX,
+      posY: s.posY
+         
     }
-    countId++
+    
   }
 
   return undefined
