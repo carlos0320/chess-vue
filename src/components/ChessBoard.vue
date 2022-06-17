@@ -7,7 +7,7 @@
     :draggable="true"
   )
 button(@click="newGame") nuevo juego
-p {{ $store.state.pieces[0]}} 
+
     
 </template>
 

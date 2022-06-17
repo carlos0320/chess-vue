@@ -3,10 +3,12 @@ div(:class="(color === 'w') ? 'tile white-tile img-container' : 'tile black-tile
   @dragover.prevent
   @drop.prevent="drop"
   @drop="onDrop")  
-  div(v-if="currentPiece")         
+  .image-container(v-if="currentPiece && currentPiece.status" @drop.prevent="drop" @drop="onDrop")         
     img( 
       :src="require(`@/${image}`)"
       :draggable="draggable"
+      
+      @dragover.prevent
       @dragstart="dragStart($event)"
       @dragover.stop
       )   
@@ -40,7 +42,8 @@ export default {
   computed:{
     ...mapState(['pieces']),
     image(){
-      if (!this.currentPiece) return null
+      console.log('piece', this.currentPiece)
+      if (!this.currentPiece)  return null
 
       if( this.currentPiece.type === 'pawn' && this.currentPiece.color ==='w' ){
         return 'assets/images/pawn_w.png'
@@ -70,7 +73,8 @@ export default {
     },
 
     currentPiece () {
-      return this.pieces.find(item => item.xpos === this.xpos && this.ypos == item.ypos)
+      return this.pieces.find(item => item.xpos === this.xpos && this.ypos == item.ypos && item.status)
+
     }
   },
 
@@ -80,15 +84,38 @@ export default {
       e.dataTransfer.effectAllowed ='move'
       e.dataTransfer.setData('piece_id', this.currentPiece.id)
     },
+    
 
     drop (e){
       const pieceId = e.dataTransfer.getData('piece_id')
+      console.log( this.pieces )   
 
-      this.$store.dispatch('movePiece', {
-        xpos: this.xpos,
-        ypos: this.ypos,
-        id: pieceId
-      })
+      const captPiece = this.pieces.find( item => {
+          if ( (item.xpos === this.xpos) && ( item.ypos === this.ypos ) && item.status && (item.id != pieceId)){
+            return item          
+          }          
+      });
+
+      if ( captPiece ){
+        console.log( captPiece.id, captPiece.type, captPiece.color )
+        this.$store.dispatch('removePiece', captPiece)
+        this.$store.dispatch('movePiece', {
+          xpos: this.xpos,
+          ypos: this.ypos,
+          id: pieceId
+        })
+      } else{
+         this.$store.dispatch('movePiece', {
+          xpos: this.xpos,
+          ypos: this.ypos,
+          id: pieceId
+        })
+      }
+
+      
+      
+
+     
     },
   }
 }
@@ -115,9 +142,17 @@ export default {
     background-color: #ebecd0;
   }
 
+  .image-container{
+   height: inherit;
+   width: 60px;
+   display: flex;
+   justify-content: center;
+   align-items: center;
+  }
+
   
   img{
-    width: 67px;
+    width: 60px;
 
   }
 

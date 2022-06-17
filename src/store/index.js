@@ -21,21 +21,24 @@ export default createStore({
       state.gameId = gameId
     },
 
-    upsertPiece( state, { id, xpos, ypos, type, color } ){
+    upsertPiece( state, { id, xpos, ypos, type, color, status } ){
       const piece = state.pieces.find(item => item.id === id)
+      
       if (!piece) {
-        state.pieces.push({ id, xpos, ypos, type, color })
+        state.pieces.push({ id, xpos, ypos, type, color,status })
       } else {
         piece.id = id 
         piece.xpos = xpos 
         piece.ypos = ypos 
         piece.type = type 
-        piece.color = color 
+        piece.color = color,
+        piece.status = status 
       }
     },
 
     deletePiece(state, { id }) {
       const piece = state.pieces.find(item => item.id === id)
+      console.log("deleting...")
       if (!piece) return
       state.pieces.splice(state.pieces.indexOf(piece), 1)
     }
@@ -43,22 +46,24 @@ export default createStore({
 
   actions:{
     async initNewGame( {commit, dispatch} ){
-      // const batch = writeBatch(db)
-      // const gameRef = doc(collection(db, 'games'))
-      // batch.set(gameRef, {
-      //   date: Timestamp.now()
-      // })
+      //const batch = writeBatch(db)
+      //const gameRef = doc(collection(db, 'games'))
+      //batch.set(gameRef, {
+       //date: Timestamp.now()
+      //})
 
-      // const pieces = JSON.parse(JSON.stringify(initialPositions))
-      // for (let data of pieces) {
-      //   const pieceRef = doc(collection(gameRef, 'pieces'))
-      //   batch.set(pieceRef, data)
-      // }
+     //const pieces = JSON.parse(JSON.stringify(initialPositions))
+     //console.log( pieces )
+     //for (let data of pieces) {
+       //const pieceRef = doc(collection(gameRef, 'pieces'))
+       //console.log( pieceRef )
+       //batch.set(pieceRef, data)
+     //}
 
-      // await batch.commit()
+     //await batch.commit()
 
       // commit('startGame', gameRef.id)
-      commit('startGame', 'KUAFwu4jIn6bKgu2NdhC')
+      commit('startGame', 'rztP2EBvIRF58gtKUkbV')
       dispatch('connect')
     },
 
@@ -73,6 +78,7 @@ export default createStore({
           const data = change.doc.data()
           data.id = change.doc.id
           if (change.type === "added") {
+            console.log( change.doc.data())
             commit("upsertPiece", data)             
           }
           if (change.type === "modified") {
@@ -80,6 +86,7 @@ export default createStore({
           }
           if (change.type === "removed") {
             commit("deletePiece", data)
+            console.log('deleting...')
           }
         });
       });
@@ -90,6 +97,15 @@ export default createStore({
         xpos,
         ypos
       }, { merge: true })
+    },
+
+    async removePiece({ state }, { id }){
+      console.log(id)
+      console.log("called")
+      
+      await updateDoc(doc(db,'games', state.gameId, 'pieces', String(id)),{
+        status: false
+      },{ merge: true })
     }
   }
 })
