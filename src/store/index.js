@@ -1,5 +1,5 @@
 import { createStore } from 'vuex';
-import { collection, onSnapshot, query, doc, updateDoc, deleteDoc, writeBatch, Timestamp } from 'firebase/firestore'
+import { collection, onSnapshot, query, doc, updateDoc, deleteDoc, writeBatch, Timestamp,getDocs } from 'firebase/firestore'
 
 import db from '@/services/firebase'
 
@@ -11,11 +11,27 @@ let unsubscribe
 export default createStore({
 
   state:{
+    games:[],
     gameId: null,
     pieces:[]
   },
 
   mutations:{
+
+    activeGames( state, gameId ){
+      if ( state.games.length > 0 ){
+        console.log('games',gameId)
+        let game = state.games.find( game => game === gameId )
+        if ( !game ){
+          state.games.push( gameId )
+        }else{
+          return
+        }
+      }else{
+        state.games.push( gameId )
+      }
+    },
+
     startGame( state, gameId ){
       state.pieces = []
       state.gameId = gameId
@@ -45,27 +61,33 @@ export default createStore({
   },
 
   actions:{
-    async initNewGame( {commit, dispatch} ){
-      //const batch = writeBatch(db)
-      //const gameRef = doc(collection(db, 'games'))
-      //batch.set(gameRef, {
-       //date: Timestamp.now()
-      //})
-
-     //const pieces = JSON.parse(JSON.stringify(initialPositions))
-     //console.log( pieces )
-     //for (let data of pieces) {
-       //const pieceRef = doc(collection(gameRef, 'pieces'))
-       //console.log( pieceRef )
-       //batch.set(pieceRef, data)
-     //}
-
-     //await batch.commit()
-
-      // commit('startGame', gameRef.id)
-      commit('startGame', 'rztP2EBvIRF58gtKUkbV')
+    async fetchGame({ commit, dispatch}, idGame){
+      commit('startGame', idGame)
       dispatch('connect')
     },
+    async initNewGame( {commit, dispatch} ){
+      const batch = writeBatch(db)
+      const gameRef = doc(collection(db, 'games'))
+      batch.set(gameRef, {
+       date: Timestamp.now()
+      })
+
+     const pieces = JSON.parse(JSON.stringify(initialPositions))
+     //console.log( pieces )
+     for (let data of pieces) {
+       const pieceRef = doc(collection(gameRef, 'pieces'))
+       //console.log( pieceRef )
+       batch.set(pieceRef, data)
+     }
+
+     await batch.commit()
+     console.log( gameRef.id )
+     commit('startGame', gameRef.id)
+     commit('activeGames', gameRef.id)
+      // commit('startGame', idGame)
+      dispatch('connect')
+    },
+
 
     async connect({ commit, state, dispatch}){
       if (unsubscribe) {
@@ -106,6 +128,31 @@ export default createStore({
       await updateDoc(doc(db,'games', state.gameId, 'pieces', String(id)),{
         status: false
       },{ merge: true })
+    },
+    
+
+    async getGames({ state, commit }){
+      try {
+        const querySnapshot = await getDocs(collection(db, "games"));
+        querySnapshot.forEach((doc) => {
+          // doc.data() is never undefined for query doc snapshots
+          // console.log(doc.id, " => ", doc.data());
+
+          // if ( state.games.length > 0 ){
+          //   console.log( state.games )
+          //   // state.games.forEach( game => {
+          //   //   if ( game != doc.id){
+          //   //     commit('activeGames', doc.id)
+          //   //   }
+          //   // })
+          // }
+          commit('activeGames', doc.id)
+        });
+        
+      } catch (error) {
+        
+      }
+
     }
   }
 })

@@ -1,11 +1,11 @@
 <template lang="pug">
 div#app
-  ChessBoard  
+   ChessBoard
 </template>
 
 <script>
 
-import ChessBoard from './components/ChessBoard.vue'
+import ChessBoard from '../components/ChessBoard.vue'
 
 export default {
   name: 'Board',

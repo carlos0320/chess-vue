@@ -5,10 +5,7 @@
     :xpos="square.xpos"
     :ypos="square.ypos"    
     :draggable="true"
-  )
-button(@click="newGame") nuevo juego
-
-    
+  )   
 </template>
 
 <script>
@@ -20,7 +17,8 @@ export default {
 
   data(){
     return{
-      squares: []
+      squares: [],
+      gameId: this.$route.params.gameId,
     }
   },
 
@@ -47,11 +45,12 @@ export default {
         })
       }
     }
+    this.newGame();
   },
   
   methods:{
     newGame(){
-      this.$store.dispatch('initNewGame')
+      this.$store.dispatch('fetchGame',this.gameId)
     }
   }
 }
