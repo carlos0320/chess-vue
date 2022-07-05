@@ -16,14 +16,23 @@ export default {
         login: { username : ''}
       }
     },
-    methods: {
+    methods: {      
       onSubmit (evt){
+        console.log('called')
         evt.preventDefault()
+        let user = {
+          username: this.login.username,
+          isPlaying: false
+        }
+        this.$store.dispatch('saveUser', user)
         router.push({
           name: 'ChessRooms',
           params: { username: this.login.username }
         })
       }
+    },
+    mounted(){
+      this.$store.dispatch('getUsersConnected')
     }
 }
 </script>

@@ -1,5 +1,15 @@
 <template lang="pug">
 h1 Chess rooms
+h2 Active players
+.online-players()
+  table
+    tr
+      th User name
+      th Invitar a jugar
+    template(v-for="player in onlinePlayers")
+    tr
+      td {{ player.username }}
+      td jugar    
 p {{ username }}
 button(@click="startNewGame") NewGame
 .active-games(v-for="game in games" :key="game")
@@ -16,7 +26,7 @@ export default {
     }
   },
   computed:{
-    ...mapState(['games'])
+    ...mapState(['games','onlinePlayers'])
   },
   methods:{
     startNewGame(){
@@ -34,5 +44,7 @@ export default {
 </script>
 
 <style>
+  .online-players{
 
+  }
 </style>

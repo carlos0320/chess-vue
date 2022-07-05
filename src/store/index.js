@@ -11,12 +11,15 @@ let unsubscribe
 export default createStore({
 
   state:{
+    onlinePlayers:[],
     games:[],
     gameId: null,
     pieces:[]
   },
 
   mutations:{
+
+    // onlinePlayers( state )
 
     activeGames( state, gameId ){
       if ( state.games.length > 0 ){
@@ -88,6 +91,43 @@ export default createStore({
       dispatch('connect')
     },
 
+    async connectOnlineUsers({ commit, state, dispatch }){
+
+      if (unsubscribe) {
+        unsubscribe()
+      }
+
+      const q = query(collection(db, "players", state.gameId, 'pieces'));
+      unsubscribe = onSnapshot(q, (snapshot) => {
+        snapshot.docChanges().forEach((change) => {
+          const data = change.doc.data()
+          data.id = change.doc.id
+          if (change.type === "added") {
+            console.log( change.doc.data())
+            commit("upsertPiece", data)             
+          }
+          if (change.type === "modified") {
+            commit("upsertPiece", data)
+          }
+          if (change.type === "removed") {
+            commit("deletePiece", data)
+            console.log('deleting...')
+          }
+        });
+      });
+
+    },
+    async getUsersConnected({ commit, state, dispatch }){
+      const playersRef = doc(collection(db, 'players'))
+            // Retrieve new posts as they are added to our database
+      // Attach an asynchronous callback to read the data at our posts reference
+      playersRef.on('value', (snapshot) => {
+        console.log(snapshot.val());
+      }, (errorObject) => {
+        console.log('The read failed: ' + errorObject.name);
+      }); 
+    },
+
 
     async connect({ commit, state, dispatch}){
       if (unsubscribe) {
@@ -129,7 +169,43 @@ export default createStore({
         status: false
       },{ merge: true })
     },
+
+    async saveUser({ state }, user ){
+      console.log( 'called' )
+      const batch = writeBatch(db)
+      const gameRef = doc(collection(db, 'players', 'P7fvewsEb8HVtkm6lDk0', 'online'))
+      batch.set(gameRef, {
+       date: Timestamp.now()
+      })
+
+      const playerRef = doc(collection(gameRef, 'player'))
+      batch.set(gameRef, user )
+
+      await batch.commit()     
+      state.onlinePlayers.push( user )
+    },
     
+    // async getOnlineUsers({ state, commit }){
+    //   try {
+    //     const querySnapshot = await getDocs(collection(db, "players"));
+    //     querySnapshot.forEach((doc) => {
+    //       // doc.data() is never undefined for query doc snapshots
+    //       // console.log(doc.id, " => ", doc.data());
+
+    //       // if ( state.games.length > 0 ){
+    //       //   console.log( state.games )
+    //       //   // state.games.forEach( game => {
+    //       //   //   if ( game != doc.id){
+    //       //   //     commit('activeGames', doc.id)
+    //       //   //   }
+    //       //   // })
+    //       // }
+    //       commit('activeGames', doc.id)
+        
+    //   } catch (error) {
+        
+    //   }
+    // }
 
     async getGames({ state, commit }){
       try {
