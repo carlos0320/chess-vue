@@ -21,6 +21,7 @@ export default createStore({
     games:[],
     gameId: null,
     pieces:[],
+    
     //user: null
   },
 
@@ -161,12 +162,14 @@ export default createStore({
       //console.log("deleting usergame", id1,id2 )
       await updateDoc(doc(db,"players", 'P7fvewsEb8HVtkm6lDk0', 'online', String(id1)),{
         gameId: null,
-        isPlaying: false
+        isPlaying: false,
+        invitations: null
       }, { merge: true })
       dispatch('connectOnlineUsers')
       await updateDoc(doc(db,"players", 'P7fvewsEb8HVtkm6lDk0', 'online', String(id2)),{
         gameId: null,
-        isPlaying: false
+        isPlaying: false,
+        invitations: null
       }, { merge: true })
      
       
@@ -304,11 +307,11 @@ export default createStore({
       //console.log('called', id1)
       await updateDoc(doc(db,"players", 'P7fvewsEb8HVtkm6lDk0', 'online', String(id1)),{
         gameId,
-        isPlaying:true
+        isPlaying:true,        
       }, { merge: true })
       await updateDoc(doc(db,"players", 'P7fvewsEb8HVtkm6lDk0', 'online', String(id2)),{
         gameId,
-        isPlaying:true
+        isPlaying:true,        
       }, { merge: true })
       //dispatch('connectOnlineUsers')
     },

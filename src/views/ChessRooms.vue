@@ -1,22 +1,36 @@
 <template lang="pug">
-h1 Chess rooms
-template(v-if="invitation")
-  p you have an invitatio to play from {{ invitation }}
-  button(@click="initGame(invitation)") Aceptar desafio
-h2 Active players
-.online-players()
-  table
-    tr
-      th User name
-      th Invitar a jugar
-    template(v-for="player in onlinePlayers")
-      tr
-        template(v-if="!player.isPlaying")
-          td {{ player.username }}
-          td.invite-to-play(@click="sendInvitation(player.id)") Invitar a jugar
-          
+.chess-rooms_wrapper
+  .chess-rooms_container
+    p.title Chess rooms
+    template(v-if="invitation")
+      p you have an invitatio to play from {{ invitation }}
+      button(@click="initGame(invitation)") Aceptar desafio
+    p.subtitle Welcome! 
+      span {{ username }}
+    .online-players-container
+      .online-players-active
+        h3 Available players
+        table
+          tr
+            th User name
+            th Invite to play
+          template(v-for="player in onlinePlayers")
+            tr
+              template(v-if="!player.isPlaying && (player.username !== username)")
+                td {{ player.username }}
+                td.invite-to-play(@click="sendInvitation(player.id)") Invite
+      .online-players-playing
+        h3 Currently playing
+        table
+          tr
+            th Player 1
+            th Player 2            
+          template(v-for="player in onlinePlayers")
+            tr
+              template(v-if="player.isPlaying")
+                td {{ player.username || player.invitations }}
+                td {{ player.username || player.invitations }}               
             
-          
 p {{ username }}
 button(@click="startNewGame") NewGame
 template(v-if="provideLink")
@@ -169,12 +183,91 @@ export default {
 }
 </script>
 
-<style>
+<style lang="less" scoped>
+  
+  *{
+    box-sizing: border-box;   
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    background-color:#312E2B
+  }
+
+  p{
+    color: #ebecd0;
+    &.title{
+      font-size: 60px;
+      font-weight: bold      
+    }
+    &.subtitle{
+      font-size: 35px;
+      font-weight: bold;
+      color: #77a556;
+    }
+  }
+
+  h3{
+    color: #ffff;
+    background:transparent ;
+  }
+
+  .chess-rooms_container{
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+    background-color:#312E2B
+  }
+
+  .chess-rooms_container{
+    width: 80%;
+    margin: 0px auto;
+    padding-top: 50px;
+  }
+
+  .online-players-container{    
+    width: 80%;
+    margin: 70px auto;
+    display: flex;
+    justify-content: space-between;
+    background-color: #100f0f;
+  }
+  .online-players-active{
+    padding: 10px;
+    width: 40%;    
+    background: transparent;
+  }
+  .online-players-playing{
+    padding: 10px;
+    width: 40%;    
+    background: transparent;
+  }
+  table{
+    padding-top: 10px;
+    background-color: #100f0f;
+    width: 100%;        
+  }
+  tr,td,th{
+    background-color: #100f0f;
+    color: #fff;
+  }
+  tr{
+    border: 1px solid #312E2B;  
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    margin: 5px;
+  }
   .online-players{
 
   }
   .invite-to-play{
-    color: green;
+    color: #ffff;
+    width: 120px;
+    text-align: center;
+    background: #7fa650;
     cursor: pointer;
+    padding: 3px;
+    border-radius: 2px;
   }
 </style>
