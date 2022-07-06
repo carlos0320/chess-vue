@@ -42,7 +42,7 @@ export default {
   computed:{
     ...mapState(['pieces']),
     image(){
-      console.log('piece', this.currentPiece)
+      
       if (!this.currentPiece)  return null
 
       if( this.currentPiece.type === 'pawn' && this.currentPiece.color ==='w' ){
@@ -88,7 +88,7 @@ export default {
 
     drop (e){
       const pieceId = e.dataTransfer.getData('piece_id')
-      console.log( this.pieces )   
+      
 
       const captPiece = this.pieces.find( item => {
           if ( (item.xpos === this.xpos) && ( item.ypos === this.ypos ) && item.status && (item.id != pieceId)){

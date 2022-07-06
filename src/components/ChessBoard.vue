@@ -50,7 +50,10 @@ export default {
   
   methods:{
     newGame(){
+      console.log('MOUNTEDD', this.gameId)
       this.$store.dispatch('fetchGame',this.gameId)
+      //this.$store.dispatch('connect')
+      //this.$store.dispatch('connectOnlineUsers')
     }
   }
 }

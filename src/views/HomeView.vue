@@ -21,8 +21,11 @@ export default {
         console.log('called')
         evt.preventDefault()
         let user = {
+          id: (new Date().getTime()).toString(36),
           username: this.login.username,
-          isPlaying: false
+          isPlaying: false,
+          invitations:null,
+          gameId:null
         }
         this.$store.dispatch('saveUser', user)
         router.push({
@@ -32,7 +35,8 @@ export default {
       }
     },
     mounted(){
-      this.$store.dispatch('getUsersConnected')
+      //this.$store.dispatch('getPlayersGame')
+      this.$store.dispatch('connectOnlineUsers')
     }
 }
 </script>
