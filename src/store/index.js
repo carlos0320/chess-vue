@@ -21,7 +21,7 @@ export default createStore({
     games:[],
     gameId: null,
     pieces:[],
-    
+    rooms:[]
     //user: null
   },
 
@@ -37,6 +37,14 @@ export default createStore({
     // },
 
     // onlinePlayers( state )
+
+    removeRoom( state, { gameId }){
+      state.rooms = state.rooms.filter( room => room.gameId !== gameId) 
+    },
+
+    setRoom ( state, { gameId, player1, player2 }){
+      
+    },
 
     setPlayers( state, { gameId, player1, player2 } ){
       state.games.push({
@@ -75,17 +83,22 @@ export default createStore({
       state.onlinePlayers = []
     },
 
-    upsertPlayer( state, { id, username, isPlaying, invitations, gameId }){
+    startRooms( state ){
+      state.rooms = []
+    },
+
+    upsertPlayer( state, { id, username, isPlaying, invitations, gameId, status }){
       console.log('UPSERTING', username)
       const player = state.onlinePlayers.find( player => player.id === id )
 
       if (!player){
-        state.onlinePlayers.push({id, username, isPlaying, invitations, gameId })
+        state.onlinePlayers.push({id, username, isPlaying, invitations, gameId, status })
       }else{
         player.username = username
         player.isPlaying = isPlaying
         player.invitations = invitations
         player.gameId = gameId
+        player.status = status
         state.onlinePlayers = state.onlinePlayers.map( item => {
           if ( item.id === id ){
             return {
@@ -97,10 +110,46 @@ export default createStore({
           }
         })        
       }
-
-      
-
     },
+
+    upsertRoom(state, { id, gameId, black, white, userB, userW, status }){
+      console.log('UPSERTING ROOM', gameId)
+      let userBlack = state.onlinePlayers.find( player => player.id === black)
+      let userWhite = state.onlinePlayers.find( player => player.id === white)
+
+      const roomsPlaying = state.rooms.find( room => room.gameId === gameId )
+      
+      if (!roomsPlaying){
+        state.rooms.push({
+          id,
+          gameId,
+          black,
+          white,
+          userB : userBlack.username,
+          userW: userWhite.username,
+          status
+        })
+      }else{
+        roomsPlaying.gameId = gameId
+        roomsPlaying.black = black
+        roomsPlaying.white = white
+        roomsPlaying.userB = userBlack.username
+        roomsPlaying.userW = userWhite.username
+        roomsPlaying.status = status
+        
+        state.rooms = state.rooms.map( item => {
+          if ( item.gameId === gameId ){
+            return {
+              id,
+              ...roomsPlaying
+            } 
+          }else{
+            return item
+          }
+        })        
+      }
+    },
+
 
 
     upsertPiece( state, { id, xpos, ypos, type, color, status } ){
@@ -170,9 +219,37 @@ export default createStore({
         gameId: null,
         isPlaying: false,
         invitations: null
+      }, { merge: true })      
+    },
+
+    async removingUsersPlaying({ commit, dispatch }, { id }){
+      console.log('removingggggggg')
+      await updateDoc(doc(db,"rooms", 'vkuR1EmCBLWTOZw07arF', 'online', String(id)),{        
+        status: false
       }, { merge: true })
-     
-      
+    },
+
+    async logoutUser({ commit, dispatch }, { id }){
+      console.log('loogout')
+      await updateDoc(doc(db,"players", 'P7fvewsEb8HVtkm6lDk0', 'online', String(id)),{        
+        status: false
+      }, { merge: true })
+      dispatch('connectOnlineUsers')
+    },
+
+    async creatingRoom({ commit, dispatch }, room){
+      console.log( 'called CREATING ROOM' )
+      const batch = writeBatch(db)
+      const gameRef = doc(collection(db, 'rooms', 'vkuR1EmCBLWTOZw07arF', 'online'))
+      batch.set(gameRef, {
+       date: Timestamp.now()
+      })
+
+      batch.set(gameRef, room )
+
+      await batch.commit()
+      commit('startRooms')
+      dispatch('connectRooms') 
     },
 
     async fetchPlayers({ commit, dispatch}){
@@ -226,8 +303,38 @@ export default createStore({
      
      // commit('startGame', idGame)
      dispatch('connect')
+     //commit('setRoom',{ gameId: gameRef.id, player1, player2})
      dispatch('updateUserGame',{id1:player1, id2:player2, gameId: gameRef.id})
-     dispatch('connectOnlineUsers')
+     
+     let randomNumber = Math.random()
+      let black = ''
+      let white = ''
+      let room ={}
+      let userB = null
+      let userW = null
+      //id: (new Date().getTime()).toString(36)
+      //user1 = state.onlinePlayers.find( player => player.id === player1)
+      //user2 = state.onlinePlayers.find( player => player.id === player2)
+
+      if ( randomNumber <= 0.5 ){
+        black = player1
+        white = player2
+      }else{
+        black = player2
+        white = player1        
+      }
+
+      room = {
+        id: (new Date().getTime()).toString(36),
+        gameId: gameRef.id,
+        black,
+        white,
+        userB,
+        userW,
+        status: true
+      }      
+      dispatch('creatingRoom', room)
+      dispatch('connectOnlineUsers')
     //  commit('setPlayers',{ gameId: gameRef.id, player1,player2})
     //  //commit('activeGames', gameRef.id)
     //   // commit('startGame', idGame)
@@ -260,6 +367,28 @@ export default createStore({
       });
 
     },
+
+    async connectRooms({ commit, state, dispatch }){
+      const q = query(collection(db, "rooms", 'vkuR1EmCBLWTOZw07arF', 'online'));
+      unsubscribe = onSnapshot(q, (snapshot) => {
+        snapshot.docChanges().forEach((change) => {
+          const data = change.doc.data()
+          data.id = change.doc.id
+          if (change.type === "added") {
+            console.log('ROOOOOMM')
+            commit("upsertRoom", data)             
+          }
+          if (change.type === "modified") {
+            commit("upsertRoom", data)
+          }
+          if (change.type === "removed") {
+            //commit("deletePiece", data)
+            console.log('deleting...')
+          }
+        });
+      });
+    },
+
     async getUsersConnected({ commit, state, dispatch }){
       const playersRef = doc(collection(db, 'players'))
             // Retrieve new posts as they are added to our database

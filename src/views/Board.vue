@@ -1,6 +1,10 @@
 <template lang="pug">
 div#app
    ChessBoard
+   template(v-for="room in rooms")
+    .players-container(v-if="room.gameId === gameId")        
+      p.black {{ room.userB }}
+      p.white {{ room.userW }}
    button(@click="finishGame").finish-game Finish Game
 </template>
 
@@ -21,7 +25,7 @@ export default {
     ChessBoard
   },
   computed:{
-    ...mapState(['games','onlinePlayers'])
+    ...mapState(['games','onlinePlayers', 'rooms'])
   },
   watch:{
     
@@ -39,6 +43,9 @@ export default {
     finishGame(){
       console.log( this.username )
       console.log(this.onlinePlayers)
+      let room = this.rooms.find( room => room.gameId === this.gameId )
+      let idRoom = room.id
+      this.$store.dispatch('removingUsersPlaying', { id: idRoom})
       let idPlayers = []
       this.onlinePlayers.forEach(element => {
         if ( element.gameId === this.gameId ){
@@ -64,6 +71,7 @@ export default {
     },
     checkFinishGame(){
       //this.$store.dispatch('connectOnlineUsers')
+      this.$store.dispatch('connectRooms')
       console.log("Call mEEEEEE", this.username, this.onlinePlayers)
       console.log("Call mEEEEEE22222", this.username, this.$store.state.onlinePlayers)
       this.onlinePlayers.forEach(element => {
@@ -85,6 +93,7 @@ export default {
 
   mounted(){
     console.log('eso')
+    this.$store.dispatch('connectRooms')
     //this.$store.dispatch('fetchGame',this.gameId)
     //this.$store.dispatch('connectOnlineUsers')
     console.log('eso2')
@@ -94,9 +103,10 @@ export default {
 
 <style lang="less" scoped>
 *{
-  box-sizing: border-box;
+  box-sizing: border-box;   
   margin: 0;
   padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 }
 #app {
   display: flex;  
@@ -104,11 +114,44 @@ export default {
   background-color:#202020;
 }
 
+.players-container{
+  height: 100%;
+  
+  width: 160px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  margin-right: 30px;
+}
+
+.black{
+  color: white;
+  font-size: 30px;
+  font-weight: bold;
+  width: 80%;
+  height: 30%;
+  padding-top:60px;
+}
+.white{
+  color: white;
+  font-size: 30px;
+  font-weight: bold;
+  width: 80%;
+  height: 30%;
+  padding-top:60px;
+}
+
 .finish-game{
 
-  width: 100px;
-  height:100px;
-  margin-top: 15%
+  width: 120px;
+  height:70px;
+  color: #fff;
+  background:#77a556;
+  border-radius: 3px;
+  border: none;
+  margin-top: 15%;
+  font-size: 18px;
 }
 
 </style>

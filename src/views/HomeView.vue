@@ -30,7 +30,8 @@ export default {
           username: this.login.username,
           isPlaying: false,
           invitations:null,
-          gameId:null
+          gameId:null,
+          status: true
         }
         this.$store.dispatch('saveUser', user)
         this.$router.push({

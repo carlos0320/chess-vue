@@ -1,12 +1,14 @@
 <template lang="pug">
 .chess-rooms_wrapper
   .chess-rooms_container
-    p.title Chess rooms
-    template(v-if="invitation")
-      p you have an invitatio to play from {{ invitation }}
-      button(@click="initGame(invitation)") Aceptar desafio
+    .logout-rooms_container
+      p.logout-icon(@click="logout") Logout
     p.subtitle Welcome! 
       span {{ username }}
+    p.title Chess rooms
+    template(v-if="invitation")
+      p.challenge-messaging You have an invitation to play from {{ invitation }}
+      button.accept-challenge(@click="initGame(invitation)") Accept   
     .online-players-container
       .online-players-active
         h3 Available players
@@ -15,8 +17,8 @@
             th User name
             th Invite to play
           template(v-for="player in onlinePlayers")
-            tr
-              template(v-if="!player.isPlaying && (player.username !== username)")
+            template(v-if="!player.isPlaying && (player.username !== username) && (player.status)" )
+              tr
                 td {{ player.username }}
                 td.invite-to-play(@click="sendInvitation(player.id)") Invite
       .online-players-playing
@@ -25,11 +27,12 @@
           tr
             th Player 1
             th Player 2            
-          template(v-for="player in onlinePlayers")
-            tr
-              template(v-if="player.isPlaying")
-                td {{ player.username || player.invitations }}
-                td {{ player.username || player.invitations }}               
+          template(v-for="room in rooms ")
+            tr(v-if="room.status")
+              td {{ room.userB }}
+              td {{ room.userW }}      
+              
+                         
             
 p {{ username }}
 button(@click="startNewGame") NewGame
@@ -47,11 +50,12 @@ export default {
       invitation: null,
       isAvailable: true,
       provideLink: false,
+      //invitationInProgress: false
       //gameId: null
     }
   },
   computed:{
-    ...mapState(['games','onlinePlayers', 'gameId'])
+    ...mapState(['games','onlinePlayers', 'gameId', 'rooms'])
   },
   watch:{
     onlinePlayers:{
@@ -72,6 +76,11 @@ export default {
     }
   },
   methods:{
+    logout(){
+      let user = this.onlinePlayers.find( player => player.username === this.username)
+      this.$store.dispatch('logoutUser', {id: user.id})
+      this.$router.push('/')
+    },
     startNewGame(){
       this.$store.dispatch('initNewGame')
       let lastOne = this.games[this.games.length -1 ]
@@ -82,6 +91,7 @@ export default {
         id,
         message: this.username
       }
+      //this.invitationInProgress = true
       this.$store.dispatch('inviteToPlay', data)
     },
   
@@ -133,6 +143,7 @@ export default {
       
       if ( player ){
         this.invitation = player.invitations
+        //this.invitationInProgress = player.invitations
       }else{
         return
       }
@@ -174,10 +185,14 @@ export default {
 
     }
   },
+  created(){
+    },
   mounted(){
+    this.$store.dispatch('connectOnlineUsers')
+    this.$store.dispatch('connectRooms')
+    //this.$store.dispatch('connectRooms')
     //this.$store.dispatch('getGames')
     //this.$store.dispatch('fetchPlayers')
-    //this.$store.dispatch('connectOnlineUsers')
   }
   
 }
@@ -204,6 +219,10 @@ export default {
       font-weight: bold;
       color: #77a556;
     }
+    &.challenge-messaging{
+      font-size: 20px;
+      color: #ffff;
+    }
   }
 
   h3{
@@ -218,11 +237,35 @@ export default {
     padding: 0;
     background-color:#312E2B
   }
-
+  .accept-challenge{
+    width: 90px;
+    padding: 10px;
+    background: rgb(246, 89, 32);
+    color: #fff;
+    font-size: 15px;
+    border: none;
+    border-radius: 2px;
+    margin-top:10px;
+  }
   .chess-rooms_container{
     width: 80%;
     margin: 0px auto;
     padding-top: 50px;
+  }
+
+  .logout-rooms_container{
+    width: 100%;
+    
+    padding-left: 90%;
+  }
+
+  .logout-icon{
+    text-align: center;
+    padding: 5px;
+    width: 100px;
+   
+    background: #77a556;
+    cursor: pointer;
   }
 
   .online-players-container{    
@@ -270,4 +313,5 @@ export default {
     padding: 3px;
     border-radius: 2px;
   }
+
 </style>
