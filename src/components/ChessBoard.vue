@@ -14,18 +14,15 @@ import { mapState, mapActions , mapGetters} from 'vuex'
 
 export default {
   components:{ Cell },
-
   data(){
     return{
       squares: [],
       gameId: this.$route.params.gameId,
     }
   },
-
   computed:{
     ...mapState(['pieces'])
   },
-
   mounted(){
     for( let i =0; i<8; i++){
       for ( let j =0; j<8; j++){
@@ -50,11 +47,9 @@ export default {
   
   methods:{
     newGame(){
-      console.log('MOUNTEDD', this.gameId)
+     
       this.$store.dispatch('fetchGame',this.gameId)
-      this.$store.dispatch('connectRooms')
-      //this.$store.dispatch('connect')
-      //this.$store.dispatch('connectOnlineUsers')
+      this.$store.dispatch('connectRooms')      
     }
   }
 }

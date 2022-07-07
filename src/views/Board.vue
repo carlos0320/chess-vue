@@ -7,7 +7,6 @@ div#app
       p.white {{ room.userW }}
    button(@click="finishGame").finish-game Finish Game
 </template>
-
 <script>
 import { mapState, mapActions , mapGetters} from 'vuex'
 import ChessBoard from '../components/ChessBoard.vue'
@@ -27,22 +26,17 @@ export default {
   computed:{
     ...mapState(['games','onlinePlayers', 'rooms'])
   },
-  watch:{
-    
+  watch:{    
     onlinePlayers:{
       immediate: true,
-      handler( value ){
-        //this.finishGame()
-        //this.checkUserLink()
-        //this.checkUser()
+      handler( value ){        
         this.checkFinishGame()
       }
     }
   },  
   methods:{
     finishGame(){
-      console.log( this.username )
-      console.log(this.onlinePlayers)
+      
       let room = this.rooms.find( room => room.gameId === this.gameId )
       let idRoom = room.id
       this.$store.dispatch('removingUsersPlaying', { id: idRoom})
@@ -52,31 +46,16 @@ export default {
           idPlayers.push( element.id )
         }
       });
-      console.log( 'playersssss', idPlayers)
-      //this.$store.dispatch('deleteGame', this.gameId)
-      // this.$store.dispatch('finishUserGame', {id:idPlayers[0]})
       
-      // this.$store.dispatch('finishUserGame', {id:idPlayers[1]})
-
       this.$store.dispatch('finishGame', {id1:idPlayers[0], id2:idPlayers[1]})
-      
-      
-      //this.$store.dispatch('finishUserGame', {id:idPlayers[1]})
-      
-      //this.$router.go(-2)
-      // this.$router.push({
-      //     name: 'home',
-          
-      //   })
     },
     checkFinishGame(){
       //this.$store.dispatch('connectOnlineUsers')
       this.$store.dispatch('connectRooms')
-      console.log("Call mEEEEEE", this.username, this.onlinePlayers)
-      console.log("Call mEEEEEE22222", this.username, this.$store.state.onlinePlayers)
+      
       this.onlinePlayers.forEach(element => {
         if ( (element.username === this.username) && !element.gameId ){
-          console.log( 'FINISHING', element.username)
+          
           router.push({
             name: 'ChessRooms',
             params: { username: this.username }
@@ -85,18 +64,10 @@ export default {
       });
       
     }
-  },
-  created(){
-    //this.$store.dispatch('fetchGame',this.gameId)
-    //this.$store.dispatch('connectOnlineUsers')
-  },
+  },  
 
-  mounted(){
-    console.log('eso')
+  mounted(){    
     this.$store.dispatch('connectRooms')
-    //this.$store.dispatch('fetchGame',this.gameId)
-    //this.$store.dispatch('connectOnlineUsers')
-    console.log('eso2')
   }
 }
 </script>
@@ -113,7 +84,6 @@ export default {
   height: 100vh;
   background-color:#202020;
 }
-
 .players-container{
   height: 100%;
   
@@ -124,7 +94,6 @@ export default {
   align-items: center;
   margin-right: 30px;
 }
-
 .black{
   color: white;
   font-size: 30px;
@@ -141,9 +110,7 @@ export default {
   height: 30%;
   padding-top:60px;
 }
-
 .finish-game{
-
   width: 120px;
   height:70px;
   color: #fff;

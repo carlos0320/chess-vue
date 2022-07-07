@@ -23,7 +23,7 @@ export default {
     },
     methods: {      
       submit (evt){
-        console.log('called')
+        
         evt.preventDefault()
         let user = {
           id: (new Date().getTime()).toString(36),

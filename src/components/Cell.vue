@@ -96,8 +96,7 @@ export default {
           }          
       });
 
-      if ( captPiece ){
-        console.log( captPiece.id, captPiece.type, captPiece.color )
+      if ( captPiece ){        
         this.$store.dispatch('removePiece', captPiece)
         this.$store.dispatch('movePiece', {
           xpos: this.xpos,

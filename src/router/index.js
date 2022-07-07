@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import ChessRooms from '../views/ChessRooms'
 import Board from '../views/Board'
-import SignUp from '../views/SignUp'
+
 //import GameView from '../views/GameView.vue'
 import store from '../store'
 
@@ -11,12 +11,7 @@ const routes = [
     path: '/',
     name: 'home',
     component: HomeView
-  },
-  {
-    path: '/signup',
-    name: 'signup',
-    component: SignUp
-  },
+  },  
   {
     path: '/chessrooms/:username',
     name: 'ChessRooms',

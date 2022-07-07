@@ -30,11 +30,7 @@
           template(v-for="room in rooms ")
             tr(v-if="room.status")
               td {{ room.userB }}
-              td {{ room.userW }}      
-              
-                         
-            
-
+              td {{ room.userW }}
 //- button(@click="startNewGame") NewGame
 //- template(v-if="provideLink")
 //-   router-link(:to="{ name: 'Board', params: { gameId: gameId }}") Game in progress..
@@ -65,15 +61,7 @@ export default {
         this.checkUserLink()
         //this.checkUser()
       }
-    },
-    games:{
-      immediate: true,
-      handler( value ){
-        //this.setupGame()
-        //this.$store.dispatch('fetchPlayers')
-        //this.checkUserLink()
-      }
-    }
+    },    
   },
   methods:{
     logout(){
@@ -96,14 +84,12 @@ export default {
     },
   
     checkUserLink(){
-      console.log('checking...')
+      
       //this.$store.dispatch('fetchPlayers')
       for ( let i =0; i< this.onlinePlayers.length; i++){
-        console.log("ENTREEE", this.onlinePlayers[i].username)
-        console.log("online-players",this.onlinePlayers)
+        
         if ( this.onlinePlayers[i].username === this.username && this.onlinePlayers[i].gameId ){
-          console.log("entre", this.onlinePlayers[i].username)
-          console.log("gameId", this.onlinePlayers[i].gameId)
+          
           this.isAvailable = false
           this.provideLink = true
           this.gameId = this.onlinePlayers[i].gameId
@@ -115,12 +101,11 @@ export default {
 
 
     checkUser(){
-      console.log('Arrayyy',this.onlinePlayers)
+      
       for ( let i =0; i< this.onlinePlayers.length; i++){
-        console.log("ENTREEE", this.onlinePlayers[i].username)
+        
         if ( this.onlinePlayers[i].username === this.username && this.onlinePlayers[i].gameId ){
-          console.log("entre", this.onlinePlayers[i].username)
-          console.log("gameId", this.onlinePlayers[i].gameId)
+          
           this.isAvailable = false
           this.$router.push({ name: 'Board', params: { gameId: this.onlinePlayers[i].gameId}} )
         }
@@ -128,10 +113,9 @@ export default {
     },
     goToBoard(){
       for ( let i =0; i< this.onlinePlayers.length; i++){
-        console.log("ENTREEE", this.onlinePlayers[i].username)
+        
         if ( this.onlinePlayers[i].username === this.username && this.onlinePlayers[i].gameId ){
-          console.log("entre", this.onlinePlayers[i].username)
-          console.log("gameId", this.onlinePlayers[i].gameId)
+          
           this.isAvailable = false
           this.$router.push({ name: 'Board', params: { gameId: this.onlinePlayers[i].gameId}} )
         }
@@ -150,11 +134,11 @@ export default {
     },
 
     setupGame(){
-      console.log('setted')
+      
       for( game in this.games ){
         
         if ( game.player1 === this.username || game.player2 === this.username ){
-          console.log('yes game', game )
+          
           let lastOne = game.gameId
           this.$router.push({ name: 'Board', params: { gameId: lastOne }} )
         }
@@ -171,28 +155,17 @@ export default {
           idPlayers.push( element.id )
         }
       });
-      // this.$store.dispatch('goToPlay',{ id: idPlayers[0]})
-      // this.$store.dispatch('goToPlay',{ id : idPlayers[1]})
+      
       this.$store.dispatch('initNewGame',{ player1: idPlayers[0], player2: idPlayers[1]})
 
-      // this.$store.dispatch('updateUserGame', { id1: idPlayers[0], id2: idPlayers[0], gameId: this.gameId })
-     //dispatch('updateUserGame', { id: player2, gameId: gameRef.id })
-      //this.$store.dispatch('connectOnlineUsers')
-      //this.$store.dispatch('fetchPlayers')
-      //this.checkUserLink()
-      //this.$router.push({ name: 'Board', params: { gameId: this.gameId}} )
-
-
+      
     }
   },
   created(){
     },
   mounted(){
     this.$store.dispatch('connectOnlineUsers')
-    this.$store.dispatch('connectRooms')
-    //this.$store.dispatch('connectRooms')
-    //this.$store.dispatch('getGames')
-    //this.$store.dispatch('fetchPlayers')
+    this.$store.dispatch('connectRooms')    
   }
   
 }
@@ -304,10 +277,7 @@ export default {
     justify-content: space-between;
     padding: 10px;
     margin: 5px;
-  }
-  .online-players{
-
-  }
+  }  
   .invite-to-play{
     color: #ffff;
     width: 120px;

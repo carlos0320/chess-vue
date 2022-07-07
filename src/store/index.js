@@ -16,34 +16,17 @@ let unsubscribe
 export default createStore({
 
   state:{
-    onlinePlayers:[],
-    //registeredPlayers:[],
+    onlinePlayers:[],    
     games:[],
     gameId: null,
     pieces:[],
-    rooms:[]
-    //user: null
+    rooms:[]   
   },
 
   mutations:{
 
-    // setUser(state, payload) {
-    //   // state.user = payload
-    //   // //Log out the user state
-    //   // console.log(state.user)
-    //   state.user = payload;
-    //   state.registeredPlayers.push( state.user )
-    //   console.log( state.user )
-    // },
-
-    // onlinePlayers( state )
-
     removeRoom( state, { gameId }){
       state.rooms = state.rooms.filter( room => room.gameId !== gameId) 
-    },
-
-    setRoom ( state, { gameId, player1, player2 }){
-      
     },
 
     setPlayers( state, { gameId, player1, player2 } ){
@@ -56,8 +39,7 @@ export default createStore({
 
 
     activeGames( state, gameId ){
-      if ( state.games.length > 0 ){
-        console.log('games',gameId)
+      if ( state.games.length > 0 ){        
         let game = state.games.find( game => game.id === gameId )
         if ( !game ){
           state.games.push( gameId )
@@ -73,8 +55,7 @@ export default createStore({
       state.onlinePlayers = []
     },
 
-    startGame( state, gameId ){
-      console.log("ID GAME", gameId)
+    startGame( state, gameId ){      
       state.pieces = []
       state.gameId = gameId
     },
@@ -88,9 +69,8 @@ export default createStore({
     },
 
     upsertPlayer( state, { id, username, isPlaying, invitations, gameId, status }){
-      console.log('UPSERTING', username)
+      
       const player = state.onlinePlayers.find( player => player.id === id )
-
       if (!player){
         state.onlinePlayers.push({id, username, isPlaying, invitations, gameId, status })
       }else{
@@ -113,7 +93,7 @@ export default createStore({
     },
 
     upsertRoom(state, { id, gameId, black, white, userB, userW, status }){
-      console.log('UPSERTING ROOM', gameId)
+      
       let userBlack = state.onlinePlayers.find( player => player.id === black)
       let userWhite = state.onlinePlayers.find( player => player.id === white)
 
@@ -150,8 +130,6 @@ export default createStore({
       }
     },
 
-
-
     upsertPiece( state, { id, xpos, ypos, type, color, status } ){
       const piece = state.pieces.find(item => item.id === id)
       
@@ -169,46 +147,18 @@ export default createStore({
 
     deletePiece(state, { id }) {
       const piece = state.pieces.find(item => item.id === id)
-      console.log("deleting...")
+      
       if (!piece) return
       state.pieces.splice(state.pieces.indexOf(piece), 1)
     },
-
-    // finishUserGame( state,{gameId}){
-    //   state.onlinePlayers = state.onlinePlayers.map( player => {
-    //     if ( player.gameId === gameId ){
-    //       return{
-    //         ...player,
-    //         gameId: null,
-    //         isPlaying: false
-    //       }
-    //     }else{
-    //       return player
-    //     }
-    //   })
-    //   state.onlinePlayers.forEach( player => {
-    //     if ( player.gameId === gameId ){
-
-    //     }
-    //   })
-    // }
+    
   },
 
   actions:{
 
-    // sign up action
-    // async signup({ commit }, { email, password }){
-    //   const response = await createUserWithEmailAndPassword(auth, email, password)
-    //   if (response) {
-    //       commit('setUser', response.user)
-    //   } else {
-    //       throw new Error('signup failed')
-    //   }
-    //  },
-
     // FINISH GAME
     async finishUserGame({ commit, dispatch }, {id1,id2 } ){
-      //console.log("deleting usergame", id1,id2 )
+      
       await updateDoc(doc(db,"players", 'P7fvewsEb8HVtkm6lDk0', 'online', String(id1)),{
         gameId: null,
         isPlaying: false,
@@ -223,14 +173,14 @@ export default createStore({
     },
 
     async removingUsersPlaying({ commit, dispatch }, { id }){
-      console.log('removingggggggg')
+      
       await updateDoc(doc(db,"rooms", 'vkuR1EmCBLWTOZw07arF', 'online', String(id)),{        
         status: false
       }, { merge: true })
     },
 
     async logoutUser({ commit, dispatch }, { id }){
-      console.log('loogout')
+      
       await updateDoc(doc(db,"players", 'P7fvewsEb8HVtkm6lDk0', 'online', String(id)),{        
         status: false
       }, { merge: true })
@@ -238,7 +188,7 @@ export default createStore({
     },
 
     async creatingRoom({ commit, dispatch }, room){
-      console.log( 'called CREATING ROOM' )
+      
       const batch = writeBatch(db)
       const gameRef = doc(collection(db, 'rooms', 'vkuR1EmCBLWTOZw07arF', 'online'))
       batch.set(gameRef, {
@@ -258,9 +208,8 @@ export default createStore({
       dispatch('connectOnlineUsers')
     },
 
-
     async fetchGame({ commit, dispatch}, idGame){
-      console.log('CAAALEEED')
+      
       commit('startGame', idGame)
       dispatch('connect')
     },
@@ -279,24 +228,15 @@ export default createStore({
       })
 
      const pieces = JSON.parse(JSON.stringify(initialPositions))
-    //  let players = {
-    //   player1,
-    //   player2
-    //  }
-
-    //  let playersGame = doc(collection(gameRef, 'players'))
-
-    //  batch.set(playersGame, players)
-
-     //console.log( pieces )
+   
      for (let data of pieces) {
        const pieceRef = doc(collection(gameRef, 'pieces'))
-       //console.log( pieceRef )
+       
        batch.set(pieceRef, data)
      }
 
      await batch.commit()
-     console.log( gameRef.id )
+    
 
      commit('startGame', gameRef.id)
      commit('activeGames', gameRef.id)
@@ -312,9 +252,7 @@ export default createStore({
       let room ={}
       let userB = null
       let userW = null
-      //id: (new Date().getTime()).toString(36)
-      //user1 = state.onlinePlayers.find( player => player.id === player1)
-      //user2 = state.onlinePlayers.find( player => player.id === player2)
+      
 
       if ( randomNumber <= 0.5 ){
         black = player1
@@ -335,17 +273,10 @@ export default createStore({
       }      
       dispatch('creatingRoom', room)
       dispatch('connectOnlineUsers')
-    //  commit('setPlayers',{ gameId: gameRef.id, player1,player2})
-    //  //commit('activeGames', gameRef.id)
-    //   // commit('startGame', idGame)
-    //   dispatch('connect')
+   
     },
 
     async connectOnlineUsers({ commit, state, dispatch }){
-
-      // if (unsubscribe) {
-      //   unsubscribe()
-      // }
 
       const q = query(collection(db, "players", 'P7fvewsEb8HVtkm6lDk0', 'online'));
       unsubscribe = onSnapshot(q, (snapshot) => {
@@ -353,11 +284,11 @@ export default createStore({
           const data = change.doc.data()
           data.id = change.doc.id
           if (change.type === "added") {
-            console.log( change.doc.data())
+            
             commit("upsertPlayer", data)             
           }
           if (change.type === "modified") {
-            console.log(change.doc.data())
+            
             commit("upsertPlayer", data)
           }
           if (change.type === "removed") {
@@ -375,7 +306,7 @@ export default createStore({
           const data = change.doc.data()
           data.id = change.doc.id
           if (change.type === "added") {
-            console.log('ROOOOOMM')
+            
             commit("upsertRoom", data)             
           }
           if (change.type === "modified") {
@@ -383,7 +314,7 @@ export default createStore({
           }
           if (change.type === "removed") {
             //commit("deletePiece", data)
-            console.log('deleting...')
+            
           }
         });
       });
@@ -391,12 +322,11 @@ export default createStore({
 
     async getUsersConnected({ commit, state, dispatch }){
       const playersRef = doc(collection(db, 'players'))
-            // Retrieve new posts as they are added to our database
-      // Attach an asynchronous callback to read the data at our posts reference
+     
       playersRef.on('value', (snapshot) => {
-        console.log(snapshot.val());
+        
       }, (errorObject) => {
-        console.log('The read failed: ' + errorObject.name);
+        
       }); 
     },
 
@@ -412,7 +342,7 @@ export default createStore({
           const data = change.doc.data()
           data.id = change.doc.id
           if (change.type === "added") {
-            console.log('UOOOPPSERTING')
+            
             commit("upsertPiece", data)             
           }
           if (change.type === "modified") {
@@ -420,7 +350,7 @@ export default createStore({
           }
           if (change.type === "removed") {
             commit("deletePiece", data)
-            console.log('deleting...')
+            
           }
         });
       });
@@ -433,7 +363,7 @@ export default createStore({
     },
 
     async updateUserGame({ state, dispatch}, { id1,id2, gameId }){
-      //console.log('called', id1)
+      
       await updateDoc(doc(db,"players", 'P7fvewsEb8HVtkm6lDk0', 'online', String(id1)),{
         gameId,
         isPlaying:true,        
@@ -446,7 +376,7 @@ export default createStore({
     },
 
     async goToPlay({state, dispatch}, { id }){
-      console.log('called', id)
+      
       await updateDoc(doc(db,"players", 'P7fvewsEb8HVtkm6lDk0', 'online', String(id)),{
         isPlaying: true
       }, { merge: true })
@@ -461,8 +391,7 @@ export default createStore({
     },
 
     async removePiece({ state }, { id }){
-      console.log(id)
-      console.log("called")
+      
       
       await updateDoc(doc(db,'games', state.gameId, 'pieces', String(id)),{
         status: false
@@ -470,7 +399,7 @@ export default createStore({
     },
 
     async saveUser({ state, dispatch, commit }, user ){
-      console.log( 'called' )
+      
       const batch = writeBatch(db)
       const gameRef = doc(collection(db, 'players', 'P7fvewsEb8HVtkm6lDk0', 'online'))
       batch.set(gameRef, {
@@ -482,37 +411,13 @@ export default createStore({
       await batch.commit()
       commit('startPlayers')
       dispatch('connectOnlineUsers')      
-    },
-    
-    // async getOnlineUsers({ state, commit }){
-    //   try {
-    //     const querySnapshot = await getDocs(collection(db, "players"));
-    //     querySnapshot.forEach((doc) => {
-    //       // doc.data() is never undefined for query doc snapshots
-    //       // console.log(doc.id, " => ", doc.data());
+    },   
 
-    //       // if ( state.games.length > 0 ){
-    //       //   console.log( state.games )
-    //       //   // state.games.forEach( game => {
-    //       //   //   if ( game != doc.id){
-    //       //   //     commit('activeGames', doc.id)
-    //       //   //   }
-    //       //   // })
-    //       // }
-    //       commit('activeGames', doc.id)
-        
-    //   } catch (error) {
-        
-    //   }
-    // }
-
-    async getPlayersGame({ state, commit }){
-      console.log('hello')
+    async getPlayersGame({ state, commit }){     
       try {
-        const querySnapshot = await getDocs(collection(db,'games','hCpVk86Kuv55blgCeVcB','pieces'));
-        console.log('snapshot', querySnapshot )
+        const querySnapshot = await getDocs(collection(db,'games','hCpVk86Kuv55blgCeVcB','pieces'));        
         querySnapshot.forEach((doc) =>{
-          console.log('players', doc.data())
+          
         })
       } catch (error) {
         console.log( error )
@@ -523,27 +428,16 @@ export default createStore({
       try {
         const querySnapshot = await getDocs(collection(db, "games"));
         querySnapshot.forEach((doc) => {
-          // doc.data() is never undefined for query doc snapshots
-          // console.log(doc.id, " => ", doc.data());
-
-          // if ( state.games.length > 0 ){
-          //   console.log( state.games )
-          //   // state.games.forEach( game => {
-          //   //   if ( game != doc.id){
-          //   //     commit('activeGames', doc.id)
-          //   //   }
-          //   // })
-          // }
+          
           commit('activeGames', doc.id)
         });
         
       } catch (error) {
-        
+        console.log( error )
       }
 
     },
-    async deleteGame({ state, commit }, idGame){
-      console.log( 'deleting',doc(db,"games", idGame))
+    async deleteGame({ state, commit }, idGame){      
       await deleteDoc(doc(db,"games", idGame))
     }
   }
