@@ -4,25 +4,29 @@
     .logout-rooms_container
       p.logout-icon(@click="logout") Logout
     p.title Chess rooms
-    p.subtitle Welcome!
-      span {{ username }}
+    p.subtitle Welcome!  {{ username }}
     template(v-if="invitation")
       p.challenge-messaging You have an invitation to play from {{ invitation }}
       button.accept-challenge(@click="initGame(invitation)") Accept
     .online-players-container
       .online-players-active
-        h3 Available players
+        .dashboard-title Available players
         table
           tr
             th User name
             th Invite to play
-          template(v-for="player in onlinePlayers")
-            template(v-if="!player.isPlaying && (player.username !== username) && (player.status)" )
-              tr
-                td {{ player.username }}
-                td.invite-to-play(@click="sendInvitation(player.id)") Invite
+          template(v-if="onlinePlayers.length > 1")
+            template(v-for="player in onlinePlayers")
+              template()
+              template(v-if="!player.isPlaying && (player.username !== username) && (player.status)" )
+                tr
+                  td {{ player.username }}
+                  td.invite-to-play(@click="sendInvitation(player.id)") Invite
+
+          template(v-else)
+            p.noplayers_message Sorry, currently there are no online players to play with
       .online-players-playing
-        h3 Currently playing
+        .dashboard-title Currently playing
         table
           tr
             th Black Pieces
@@ -186,16 +190,25 @@ p {
     font-size: 35px;
     font-weight: bold;
     color: #77a556;
+    margin-right: 25px;
   }
   &.challenge-messaging {
     font-size: 20px;
     color: #ffff;
   }
+  &.noplayers_message{
+    padding: 10px;
+    font-size: 17px;
+    color: #acf777;
+
+  }
 }
 
-h3 {
+.dashboard-title{
   color: #ffff;
   background: transparent;
+  font-weight: bold;
+  font-size: 23px;
 }
 
 .chess-rooms_container {

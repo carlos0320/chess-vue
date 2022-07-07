@@ -6,6 +6,9 @@
       h3 Have Fun!
     .login-form
       p Please, create your user name
+      template(v-if="invalidUser")
+        p.error-user__message Your username must contain one character or more
+
       form
         div
           input( v-model.trim="login.username" type="text" placeholder="Username")
@@ -18,25 +21,31 @@ export default {
   name: 'home-view',
   data () {
     return {
-      login: { username: '' }
+      login: { username: '' },
+      invalidUser: false
     }
   },
   methods: {
     submit (evt) {
       evt.preventDefault()
-      const user = {
-        id: new Date().getTime().toString(36),
-        username: this.login.username,
-        isPlaying: false,
-        invitations: null,
-        gameId: null,
-        status: true
+      if (this.login.username.length > 0) {
+        this.invalidUser = false
+        const user = {
+          id: new Date().getTime().toString(36),
+          username: this.login.username,
+          isPlaying: false,
+          invitations: null,
+          gameId: null,
+          status: true
+        }
+        this.$store.dispatch('saveUser', user)
+        this.$router.push({
+          name: 'ChessRooms',
+          params: { username: this.login.username }
+        })
+      } else {
+        this.invalidUser = true
       }
-      this.$store.dispatch('saveUser', user)
-      this.$router.push({
-        name: 'ChessRooms',
-        params: { username: this.login.username }
-      })
     }
   },
   mounted () {
@@ -83,6 +92,11 @@ export default {
   align-items: center;
   background: #312e2b;
   font-family: "Montserrat", sans-serif;
+}
+
+.error-user__message {
+  color: rgb(212, 106, 106);
+  font-size: 15px;
 }
 
 form {
