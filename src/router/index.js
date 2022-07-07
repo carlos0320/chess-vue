@@ -1,17 +1,16 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import ChessRooms from '../views/ChessRooms'
-import Board from '../views/Board'
+import BoardView from '../views/BoardView'
 
-//import GameView from '../views/GameView.vue'
-import store from '../store'
+// import GameView from '../views/GameView.vue'
 
 const routes = [
   {
     path: '/',
-    name: 'home',
+    name: 'home-view',
     component: HomeView
-  },  
+  },
   {
     path: '/chessrooms/:username',
     name: 'ChessRooms',
@@ -19,10 +18,9 @@ const routes = [
   },
   {
     path: '/chessrooms/:username/:gameId',
-    name: 'Board',
-    component: Board
-  },
-  
+    name: 'BoardView',
+    component: BoardView
+  }
 ]
 
 const router = createRouter({

@@ -1,71 +1,69 @@
 <template lang="pug">
 .chessboard
-  Cell(v-for="square in squares" :key="square.id"
+  CellComponent(v-for="square in squares" :key="square.id"
     :color="square.color"
     :xpos="square.xpos"
-    :ypos="square.ypos"    
+    :ypos="square.ypos"
     :draggable="true"
-  )   
+  )
 </template>
 
 <script>
-import Cell from './Cell.vue'
-import { mapState, mapActions , mapGetters} from 'vuex'
+import CellComponent from './CellComponent.vue'
+import { mapState } from 'vuex'
 
 export default {
-  components:{ Cell },
-  data(){
-    return{
+  components: { CellComponent },
+  data () {
+    return {
       squares: [],
-      gameId: this.$route.params.gameId,
+      gameId: this.$route.params.gameId
     }
   },
-  computed:{
+  computed: {
     ...mapState(['pieces'])
   },
-  mounted(){
-    for( let i =0; i<8; i++){
-      for ( let j =0; j<8; j++){
+  mounted () {
+    for (let i = 0; i < 8; i++) {
+      for (let j = 0; j < 8; j++) {
+        let color = 'w'
 
-        let color = 'w';
-
-        if ( (i+j) % 2 === 0){
-          color= 'w'
-        } else{
-          color='b'
+        if ((i + j) % 2 === 0) {
+          color = 'w'
+        } else {
+          color = 'b'
         }
 
         this.squares.push({
           xpos: String(i),
           ypos: String(j),
-          color,            
+          color
         })
       }
     }
-    this.newGame();
+    this.newGame()
   },
-  
-  methods:{
-    newGame(){
-     
-      this.$store.dispatch('fetchGame',this.gameId)
-      this.$store.dispatch('connectRooms')      
+
+  methods: {
+    newGame () {
+      this.$store.dispatch('fetchGame', this.gameId)
+      this.$store.dispatch('connectRooms')
     }
   }
 }
 </script>
 
 <style lang="less" scoped>
-.chessboard{
+.chessboard {
   margin: 10px 10%;
   display: grid;
-  grid-template-columns: repeat(8,75px) ;
-  grid-template-rows: repeat(8,75px) ;
+  grid-template-columns: repeat(8, 75px);
+  grid-template-rows: repeat(8, 75px);
   width: 600px;
   height: 600px;
-  background-color: blue ;
+  background-color: blue;
 }
-button{
+button {
   margin-top: 20px;
   width: 200px;
   height: 100px;

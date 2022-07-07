@@ -4,11 +4,11 @@
     .logout-rooms_container
       p.logout-icon(@click="logout") Logout
     p.title Chess rooms
-    p.subtitle Welcome! 
+    p.subtitle Welcome!
       span {{ username }}
     template(v-if="invitation")
       p.challenge-messaging You have an invitation to play from {{ invitation }}
-      button.accept-challenge(@click="initGame(invitation)") Accept   
+      button.accept-challenge(@click="initGame(invitation)") Accept
     .online-players-container
       .online-players-active
         h3 Available players
@@ -25,8 +25,8 @@
         h3 Currently playing
         table
           tr
-            th Player 1
-            th Player 2            
+            th Black Pieces
+            th White Pieces
           template(v-for="room in rooms ")
             tr(v-if="room.status")
               td {{ room.userB }}
@@ -37,255 +37,251 @@
 </template>
 
 <script>
-import { mapState, mapActions , mapGetters} from 'vuex'
+import { mapState } from 'vuex'
 export default {
   name: 'ChessRooms',
-  data(){
-    return{
+  data () {
+    return {
       username: this.$route.params.username,
       invitation: null,
       isAvailable: true,
-      provideLink: false,
-      //invitationInProgress: false
-      //gameId: null
+      provideLink: false
+      // invitationInProgress: false
+      // gameId: null
     }
   },
-  computed:{
-    ...mapState(['games','onlinePlayers', 'gameId', 'rooms'])
+  computed: {
+    ...mapState(['games', 'onlinePlayers', 'gameId', 'rooms'])
   },
-  watch:{
-    onlinePlayers:{
+  watch: {
+    onlinePlayers: {
       immediate: true,
-      handler( value ){
+      handler (value) {
         this.checkInvitations()
         this.checkUserLink()
-        //this.checkUser()
+        // this.checkUser()
       }
-    },    
+    }
   },
-  methods:{
-    logout(){
-      let user = this.onlinePlayers.find( player => player.username === this.username)
-      this.$store.dispatch('logoutUser', {id: user.id})
+  methods: {
+    logout () {
+      const user = this.onlinePlayers.find(
+        (player) => player.username === this.username
+      )
+      this.$store.dispatch('logoutUser', { id: user.id })
       this.$router.push('/')
     },
-    startNewGame(){
+    startNewGame () {
       this.$store.dispatch('initNewGame')
-      let lastOne = this.games[this.games.length -1 ]
-      this.$router.push({ name: 'Board', params: { gameId: lastOne }} )
+      const lastOne = this.games[this.games.length - 1]
+      this.$router.push({ name: 'BoardView', params: { gameId: lastOne } })
     },
-    sendInvitation( id ){
-      let data = {
+    sendInvitation (id) {
+      const data = {
         id,
         message: this.username
       }
-      //this.invitationInProgress = true
+      // this.invitationInProgress = true
       this.$store.dispatch('inviteToPlay', data)
     },
-  
-    checkUserLink(){
-      
-      //this.$store.dispatch('fetchPlayers')
-      for ( let i =0; i< this.onlinePlayers.length; i++){
-        
-        if ( this.onlinePlayers[i].username === this.username && this.onlinePlayers[i].gameId ){
-          
+
+    checkUserLink () {
+      // this.$store.dispatch('fetchPlayers')
+      for (let i = 0; i < this.onlinePlayers.length; i++) {
+        if (
+          this.onlinePlayers[i].username === this.username &&
+          this.onlinePlayers[i].gameId
+        ) {
           this.isAvailable = false
           this.provideLink = true
           this.gameId = this.onlinePlayers[i].gameId
-          this.$router.push({ name: 'Board', params: { gameId: this.onlinePlayers[i].gameId}} )
-          
+          this.$router.push({
+            name: 'BoardView',
+            params: { gameId: this.onlinePlayers[i].gameId }
+          })
         }
       }
     },
 
-
-    checkUser(){
-      
-      for ( let i =0; i< this.onlinePlayers.length; i++){
-        
-        if ( this.onlinePlayers[i].username === this.username && this.onlinePlayers[i].gameId ){
-          
+    checkUser () {
+      for (let i = 0; i < this.onlinePlayers.length; i++) {
+        if (
+          this.onlinePlayers[i].username === this.username &&
+          this.onlinePlayers[i].gameId
+        ) {
           this.isAvailable = false
-          this.$router.push({ name: 'Board', params: { gameId: this.onlinePlayers[i].gameId}} )
-        }
-      }       
-    },
-    goToBoard(){
-      for ( let i =0; i< this.onlinePlayers.length; i++){
-        
-        if ( this.onlinePlayers[i].username === this.username && this.onlinePlayers[i].gameId ){
-          
-          this.isAvailable = false
-          this.$router.push({ name: 'Board', params: { gameId: this.onlinePlayers[i].gameId}} )
+          this.$router.push({
+            name: 'BoardView',
+            params: { gameId: this.onlinePlayers[i].gameId }
+          })
         }
       }
     },
-    checkInvitations(){
-      
-      let player = this.onlinePlayers.find( player => player.username === this.username)
-      
-      if ( player ){
+    goToBoard () {
+      for (let i = 0; i < this.onlinePlayers.length; i++) {
+        if (
+          this.onlinePlayers[i].username === this.username &&
+          this.onlinePlayers[i].gameId
+        ) {
+          this.isAvailable = false
+          this.$router.push({
+            name: 'BoardView',
+            params: { gameId: this.onlinePlayers[i].gameId }
+          })
+        }
+      }
+    },
+    checkInvitations () {
+      const player = this.onlinePlayers.find(
+        (player) => player.username === this.username
+      )
+
+      if (player) {
         this.invitation = player.invitations
-        //this.invitationInProgress = player.invitations
-      }else{
-        return
+        // this.invitationInProgress = player.invitations
       }
     },
 
-    setupGame(){
-      
-      for( game in this.games ){
-        
-        if ( game.player1 === this.username || game.player2 === this.username ){
-          
-          let lastOne = game.gameId
-          this.$router.push({ name: 'Board', params: { gameId: lastOne }} )
+    initGame (invitation) {
+      const idPlayers = []
+      this.onlinePlayers.forEach((element) => {
+        if (element.username === this.username) {
+          idPlayers.push(element.id)
+        } else if (element.username === invitation) {
+          idPlayers.push(element.id)
         }
-      }
-    },
+      })
 
-
-    initGame(invitation){
-      let idPlayers = []
-      this.onlinePlayers.forEach(element => {
-        if ( element.username === this.username ){
-          idPlayers.push( element.id )
-        } else if ( element.username === invitation ){
-          idPlayers.push( element.id )
-        }
-      });
-      
-      this.$store.dispatch('initNewGame',{ player1: idPlayers[0], player2: idPlayers[1]})
-
-      
+      this.$store.dispatch('initNewGame', {
+        player1: idPlayers[0],
+        player2: idPlayers[1]
+      })
     }
   },
-  created(){
-    },
-  mounted(){
+  created () {},
+  mounted () {
     this.$store.dispatch('connectOnlineUsers')
-    this.$store.dispatch('connectRooms')    
+    this.$store.dispatch('connectRooms')
   }
-  
 }
 </script>
 
 <style lang="less" scoped>
-  
-  *{
-    box-sizing: border-box;   
-    margin: 0;
-    padding: 0;
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-    background-color:#312E2B
-  }
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+    Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+  background-color: #312e2b;
+}
 
-  p{
-    color: #ebecd0;
-    &.title{
-      font-size: 60px;
-      font-weight: bold      
-    }
-    &.subtitle{
-      font-size: 35px;
-      font-weight: bold;
-      color: #77a556;
-    }
-    &.challenge-messaging{
-      font-size: 20px;
-      color: #ffff;
-    }
-  }
-
-  h3{
-    color: #ffff;
-    background:transparent ;
-  }
-
-  .chess-rooms_container{
-    width: 100vw;
-    height: 100vh;
-    margin: 0;
-    padding: 0;
-    background-color:#312E2B
-  }
-  .accept-challenge{
-    width: 90px;
-    padding: 10px;
-    background: rgb(246, 89, 32);
-    color: #fff;
-    font-size: 15px;
-    border: none;
-    border-radius: 2px;
-    margin-top:10px;
-    cursor: pointer;
-  }
-  .chess-rooms_container{
-    width: 80%;
-    margin: 0px auto;
-    padding-top: 50px;
-  }
-
-  .logout-rooms_container{
-    width: 100%;    
-    padding-left: 90%;
-  }
-
-  .logout-icon{   
-    display: flex;
-    align-content: center;
-    justify-content: center;
-    padding: 7px;
-    width: 100px;   
-    background: #77a556;
-    cursor: pointer;
+p {
+  color: #ebecd0;
+  &.title {
+    font-size: 60px;
     font-weight: bold;
-    border-radius: 3px;
   }
-
-  .online-players-container{    
-    width: 80%;
-    margin: 40px auto;
-    display: flex;
-    justify-content: space-between;
-    background-color: #100f0f;
-    border-radius: 5px;
+  &.subtitle {
+    font-size: 35px;
+    font-weight: bold;
+    color: #77a556;
   }
-  .online-players-active{
-    padding: 10px;
-    width: 40%;    
-    background: transparent;
-  }
-  .online-players-playing{
-    padding: 10px;
-    width: 40%;    
-    background: transparent;
-  }
-  table{
-    padding-top: 10px;
-    background-color: #100f0f;
-    width: 100%;        
-  }
-  tr,td,th{
-    background-color: #100f0f;
-    color: #fff;
-  }
-  tr{
-    border: 1px solid #312E2B;  
-    display: flex;
-    justify-content: space-between;
-    padding: 10px;
-    margin: 5px;
-  }  
-  .invite-to-play{
+  &.challenge-messaging {
+    font-size: 20px;
     color: #ffff;
-    width: 120px;
-    text-align: center;
-    background: #7fa650;
-    cursor: pointer;
-    padding: 3px;
-    border-radius: 2px;
   }
+}
 
+h3 {
+  color: #ffff;
+  background: transparent;
+}
+
+.chess-rooms_container {
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  background-color: #312e2b;
+}
+.accept-challenge {
+  width: 90px;
+  padding: 10px;
+  background: rgb(246, 89, 32);
+  color: #fff;
+  font-size: 15px;
+  border: none;
+  border-radius: 2px;
+  margin-top: 10px;
+  cursor: pointer;
+}
+.chess-rooms_container {
+  width: 80%;
+  margin: 0px auto;
+  padding-top: 50px;
+}
+
+.logout-rooms_container {
+  width: 100%;
+  padding-left: 90%;
+}
+
+.logout-icon {
+  display: flex;
+  align-content: center;
+  justify-content: center;
+  padding: 7px;
+  width: 100px;
+  background: #77a556;
+  cursor: pointer;
+  font-weight: bold;
+  border-radius: 3px;
+}
+
+.online-players-container {
+  width: 80%;
+  margin: 40px auto;
+  display: flex;
+  justify-content: space-between;
+  background-color: #100f0f;
+  border-radius: 5px;
+}
+.online-players-active {
+  padding: 10px;
+  width: 40%;
+  background: transparent;
+}
+.online-players-playing {
+  padding: 10px;
+  width: 40%;
+  background: transparent;
+}
+table {
+  padding-top: 10px;
+  background-color: #100f0f;
+  width: 100%;
+}
+tr,
+td,
+th {
+  background-color: #100f0f;
+  color: #fff;
+}
+tr {
+  border: 1px solid #312e2b;
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  margin: 5px;
+}
+.invite-to-play {
+  color: #ffff;
+  width: 120px;
+  text-align: center;
+  background: #7fa650;
+  cursor: pointer;
+  padding: 3px;
+  border-radius: 2px;
+}
 </style>
