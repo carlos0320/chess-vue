@@ -3,9 +3,9 @@
   .chess-rooms_container
     .logout-rooms_container
       p.logout-icon(@click="logout") Logout
+    p.title Chess rooms
     p.subtitle Welcome! 
       span {{ username }}
-    p.title Chess rooms
     template(v-if="invitation")
       p.challenge-messaging You have an invitation to play from {{ invitation }}
       button.accept-challenge(@click="initGame(invitation)") Accept   
@@ -34,10 +34,10 @@
               
                          
             
-p {{ username }}
-button(@click="startNewGame") NewGame
-template(v-if="provideLink")
-  router-link(:to="{ name: 'Board', params: { gameId: gameId }}") Game in progress..
+
+//- button(@click="startNewGame") NewGame
+//- template(v-if="provideLink")
+//-   router-link(:to="{ name: 'Board', params: { gameId: gameId }}") Game in progress..
 </template>
 
 <script>
@@ -246,6 +246,7 @@ export default {
     border: none;
     border-radius: 2px;
     margin-top:10px;
+    cursor: pointer;
   }
   .chess-rooms_container{
     width: 80%;
@@ -254,26 +255,29 @@ export default {
   }
 
   .logout-rooms_container{
-    width: 100%;
-    
+    width: 100%;    
     padding-left: 90%;
   }
 
-  .logout-icon{
-    text-align: center;
-    padding: 5px;
-    width: 100px;
-   
+  .logout-icon{   
+    display: flex;
+    align-content: center;
+    justify-content: center;
+    padding: 7px;
+    width: 100px;   
     background: #77a556;
     cursor: pointer;
+    font-weight: bold;
+    border-radius: 3px;
   }
 
   .online-players-container{    
     width: 80%;
-    margin: 70px auto;
+    margin: 40px auto;
     display: flex;
     justify-content: space-between;
     background-color: #100f0f;
+    border-radius: 5px;
   }
   .online-players-active{
     padding: 10px;

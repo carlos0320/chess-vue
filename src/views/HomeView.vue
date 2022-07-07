@@ -8,7 +8,7 @@
       p Please, create your user name      
       form
         div
-          input( v-model.trim="login.username" type="text" placeholder="username")
+          input( v-model.trim="login.username" type="text" placeholder="Username")
         button(type="submit" @click="submit") Join
 </template>
 
@@ -94,10 +94,16 @@ export default {
   }
 
   input{
-    width: 200px;
-    padding: 7px;
+    width: 250px;
+    padding: 10px;
     border: none;
-    border-radius: 5px;    
+    border-radius: 5px;
+    background: #52514f;
+    color: #ffff;
+    font-weight: bold;
+    font-size: 15px;
+    font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    outline: none;   
   }
 
   button{
